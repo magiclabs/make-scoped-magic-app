@@ -1,3 +1,15 @@
+# v0.0.2 (Sun Nov 03 2024)
+
+#### ⚠️ Pushed to `master`
+
+- feat: clone and initialize previous make-magic repo to make-scoped-magic-app ([@jasonatmagic](https://github.com/jasonatmagic))
+
+#### Authors: 1
+
+- [@jasonatmagic](https://github.com/jasonatmagic)
+
+---
+
 # v5.1.3 (Tue Sep 03 2024)
 
 #### 🐛 Bug Fix
