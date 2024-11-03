@@ -1,0 +1,5 @@
+/scaffolds/*/template/
+/bin.js
+/compiled
+/dist
+.eslintrc.js
