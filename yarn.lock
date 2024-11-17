@@ -174,6 +174,26 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
+"@ht-sdks/events-sdk-js-core@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@ht-sdks/events-sdk-js-core/-/events-sdk-js-core-1.1.0.tgz#15f68893614f380d6ec7c2b17c84504c74e8b522"
+  integrity sha512-x8xNf9KueBOhs1yYJ6DkoUdHizQsTc0R6sMwX02CCrkIxM3H6/ySTafz0n9JpNbCFBQFEKxe9UwWfB2WwbDXPA==
+  dependencies:
+    "@lukeed/uuid" "^2.0.0"
+    dset "^3.1.2"
+    tslib "^2.4.1"
+
+"@ht-sdks/events-sdk-js-node@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ht-sdks/events-sdk-js-node/-/events-sdk-js-node-1.0.0.tgz#7ead1190263c2f50a8127551a4cc24387846ee5e"
+  integrity sha512-CmdT5NDa4s87RK9jzpqW+shxP1G4lUn8OuJLysE5Rg31rQHBMI+KnAF+Zk+QMD8Kk+ScZBgdVuWOA35HgCLU+g==
+  dependencies:
+    "@ht-sdks/events-sdk-js-core" "^1.1.0"
+    "@lukeed/uuid" "^2.0.0"
+    buffer "^6.0.3"
+    node-fetch "^2.6.7"
+    tslib "^2.4.1"
+
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.14.tgz#d78e481a039f7566ecc9660b4ea7fe6b1fec442b"
@@ -437,26 +457,6 @@
   version "1.10.4"
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.10.4.tgz#427d5549943a9c6fce808e39ea64dbe60d4047f1"
   integrity sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==
-
-"@segment/analytics-core@1.3.0":
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/@segment/analytics-core/-/analytics-core-1.3.0.tgz"
-  integrity sha512-ujScWZH49NK1hYlp2/EMw45nOPEh+pmTydAnR6gSkRNucZD4fuinvpPL03rmFCw8ibaMuKLAdgPJfQ0gkLKZ5A==
-  dependencies:
-    "@lukeed/uuid" "^2.0.0"
-    dset "^3.1.2"
-    tslib "^2.4.1"
-
-"@segment/analytics-node@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/@segment/analytics-node/-/analytics-node-1.1.0.tgz"
-  integrity sha512-q8MPpvQJgMUSIRmQXficA33ZmLQ6s5YqUMr623xJhhfp/TGkkgfpcdMk+qSniZVIm8JuQRXm8Mbh922LG3goBQ==
-  dependencies:
-    "@lukeed/uuid" "^2.0.0"
-    "@segment/analytics-core" "1.3.0"
-    buffer "^6.0.3"
-    node-fetch "^2.6.7"
-    tslib "^2.4.1"
 
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
