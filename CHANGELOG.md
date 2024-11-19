@@ -1,3 +1,15 @@
+# v0.0.4 (Tue Nov 19 2024)
+
+#### 🐛 Bug Fix
+
+- migrate segment to HT [#6](https://github.com/magiclabs/make-scoped-magic-app/pull/6) ([@jasonatmagic](https://github.com/jasonatmagic))
+
+#### Authors: 1
+
+- [@jasonatmagic](https://github.com/jasonatmagic)
+
+---
+
 # v0.0.3 (Mon Nov 04 2024)
 
 #### ⚠️ Pushed to `master`
