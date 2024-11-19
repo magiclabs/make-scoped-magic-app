@@ -1,5 +1,5 @@
 import os from 'os';
-import { Analytics as Segment } from '@segment/analytics-node';
+import { HtEvents } from '@ht-sdks/events-sdk-js-node';
 import { loadConfig } from './config';
 import { addShutdownTask } from './utils/shutdown';
 
@@ -9,11 +9,14 @@ export interface Analytics {
   prepareForShutdown(): Promise<void>;
 }
 
-export class SegmentAnalytics implements Analytics {
-  private segment: Segment;
+export class HightouchAnalytics implements Analytics {
+  private htevents: HtEvents;
 
   constructor() {
-    this.segment = new Segment({ writeKey: 'g9GIEwAL2HOQHq6PXg9gHzSjEBuAuRLq' });
+    this.htevents = new HtEvents({
+      writeKey: 'beb757ad12ccfdaa3d8a1ada480ead6719b7d9033a747bc55b66cc4c18d18347',
+      host: 'https://us-east-1.hightouch-events.com',
+    });
     addShutdownTask(async (reason) => {
       this.logEvent('cli-tool-shutdown', reason);
       await this.prepareForShutdown();
@@ -23,20 +26,20 @@ export class SegmentAnalytics implements Analytics {
   logEvent(event: string, data: any): void {
     const config = loadConfig();
     if (config?.shouldTrackUsageData ?? false) {
-      this.segment.track({ anonymousId: config?.id ?? '', event, properties: data });
+      this.htevents.track({ anonymousId: config?.id ?? '', event, properties: data });
     }
   }
 
   identifyUser(userId: string) {
     const config = loadConfig();
     if (config?.shouldTrackUsageData ?? false) {
-      this.segment.identify({ userId, traits: { os: os.platform } });
+      this.htevents.identify({ userId, traits: { os: os.platform } });
     }
   }
 
   async prepareForShutdown(): Promise<void> {
-    await this.segment.closeAndFlush();
+    await this.htevents.closeAndFlush();
   }
 }
 
-export const SharedAnalytics = new SegmentAnalytics();
+export const SharedAnalytics = new HightouchAnalytics();

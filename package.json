@@ -80,7 +80,7 @@
     ]
   },
   "dependencies": {
-    "@segment/analytics-node": "^1.1.0",
+    "@ht-sdks/events-sdk-js-node": "^1.0.0",
     "binaryextensions": "^4.18.0",
     "ejs": "^3.1.10",
     "enquirer": "^2.4.1",
