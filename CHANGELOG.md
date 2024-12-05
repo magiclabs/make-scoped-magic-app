@@ -1,3 +1,15 @@
+# v0.0.5 (Thu Dec 05 2024)
+
+#### 🐛 Bug Fix
+
+- Create CODEOWNERS [#8](https://github.com/magiclabs/make-scoped-magic-app/pull/8) ([@noahyoshida](https://github.com/noahyoshida))
+
+#### Authors: 1
+
+- [@noahyoshida](https://github.com/noahyoshida)
+
+---
+
 # v0.0.4 (Tue Nov 19 2024)
 
 #### 🐛 Bug Fix
