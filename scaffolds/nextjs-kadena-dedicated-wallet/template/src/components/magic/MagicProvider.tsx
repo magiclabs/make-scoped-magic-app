@@ -10,11 +10,13 @@ export type Magic = MagicBase<OAuthExtension[] & KadenaExtension[]>;
 
 type MagicContextType = {
   magic: Magic | null;
+  chainId: ChainId;
   setChainId: (chainId: ChainId) => void;
 };
 
 const MagicContext = createContext<MagicContextType>({
   magic: null,
+  chainId: DEFAULT_CHAIN_ID,
   setChainId: () => {},
 });
 
@@ -22,7 +24,7 @@ export const useMagic = () => useContext(MagicContext);
 
 const MagicProvider = ({ children }: { children: ReactNode }) => {
   const [magic, setMagic] = useState<Magic | null>(null);
-  const [chainId, setChainId] = useState<ChainId>('0');
+  const [chainId, setChainId] = useState<ChainId>(DEFAULT_CHAIN_ID);
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_MAGIC_API_KEY) {
@@ -45,6 +47,7 @@ const MagicProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(() => {
     return {
       magic,
+      chainId,
       setChainId
     };
   }, [magic]);

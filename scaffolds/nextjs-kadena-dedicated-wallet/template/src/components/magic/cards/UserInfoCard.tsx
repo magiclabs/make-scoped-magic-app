@@ -8,64 +8,59 @@ import CardHeader from '@/components/ui/CardHeader';
 import CardLabel from '@/components/ui/CardLabel';
 import Spinner from '@/components/ui/Spinner';
 import { getNetworkName } from '@/utils/network';
-import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import { getBalance } from '@/utils/get-balance';
+import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
 
 const UserInfo = ({ token, setToken }: LoginProps) => {
-  const { magic, connection } = useMagic();
+  const { magic, chainId } = useMagic();
 
-  const [balance, setBalance] = useState('...');
+  const [balance, setBalance] = useState<String | Number>('...');
   const [copied, setCopied] = useState('Copy');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [publicAddress, setPublicAddress] = useState(localStorage.getItem('user'));
+  const [userInfo, setUserInfo] = useState<KadenaUserMetadata | undefined>();
+  const [accountName, setAccountName] = useState(localStorage.getItem('user'));
+
+  const getUserInfo = () => {
+    return magic?.kadena.getUserInfo();
+  };
 
   useEffect(() => {
-    const checkLoginandGetBalance = async () => {
-      const isLoggedIn = await magic?.user.isLoggedIn();
+    const checkLoginAndGetBalance = async () => {
+      const isLoggedIn = await getUserInfo();
       if (isLoggedIn) {
         try {
-          const metadata = await magic?.user.getInfo();
-          if (metadata) {
-            localStorage.setItem('user', metadata?.publicAddress!);
-            setPublicAddress(metadata?.publicAddress!);
+          const userInfo = await magic?.kadena.getUserInfo();
+          if (userInfo) {
+            localStorage.setItem('user', userInfo?.accountName);
+            setAccountName(userInfo?.accountName);
+            getBalance(userInfo.accountName, chainId).then(setBalance);
           }
         } catch (e) {
           console.log('error in fetching address: ' + e);
         }
       }
     };
-    setTimeout(() => checkLoginandGetBalance(), 5000);
+    setTimeout(() => checkLoginAndGetBalance(), 5000);
   }, []);
 
-  const getBalance = useCallback(async () => {
-    if (publicAddress && connection) {
-      const balance = await connection.getBalance(new PublicKey(publicAddress));
-      if (balance == 0) {
-        setBalance('0');
-      } else {
-        setBalance((balance / LAMPORTS_PER_SOL).toString());
-      }
-      console.log('BALANCE: ', balance);
-    }
-  }, [connection, publicAddress]);
+  // const refresh = useCallback(async () => {
+  //   setIsRefreshing(true);
+  //   await getBalance();
+  //   setTimeout(() => {
+  //     setIsRefreshing(false);
+  //   }, 500);
+  // }, [getBalance]);
 
-  const refresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await getBalance();
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 500);
-  }, [getBalance]);
+  // useEffect(() => {
+  //   if (accountName) {
+  //     refresh();
+  //   }
+  // }, [accountName, refresh]);
 
-  useEffect(() => {
-    if (connection) {
-      refresh();
-    }
-  }, [connection, refresh]);
-
-  useEffect(() => {
-    setBalance('...');
-  }, [magic]);
+  // useEffect(() => {
+  //   setBalance('...');
+  // }, [magic, chainId]);
 
   const disconnect = useCallback(async () => {
     if (magic) {
@@ -74,14 +69,14 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
   }, [magic, setToken]);
 
   const copy = useCallback(() => {
-    if (publicAddress && copied === 'Copy') {
+    if (accountName && copied === 'Copy') {
       setCopied('Copied!');
-      navigator.clipboard.writeText(publicAddress);
+      navigator.clipboard.writeText(accountName);
       setTimeout(() => {
         setCopied('Copy');
       }, 1000);
     }
-  }, [copied, publicAddress]);
+  }, [copied, accountName]);
 
   return (
     <Card>
@@ -92,8 +87,8 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
         <div className="connected">Connected to {getNetworkName()}</div>
       </div>
       <Divider />
-      <CardLabel leftHeader="Address" rightAction={!publicAddress ? <Spinner /> : <div onClick={copy}>{copied}</div>} />
-      <div className="code">{publicAddress?.length == 0 ? 'Fetching address..' : publicAddress}</div>
+      <CardLabel leftHeader="Address" rightAction={!accountName ? <Spinner /> : <div onClick={copy}>{copied}</div>} />
+      <div className="code">{accountName?.length == 0 ? 'Fetching address..' : accountName}</div>
       <Divider />
       <CardLabel
         leftHeader="Balance"
@@ -103,11 +98,16 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
               <Spinner />
             </div>
           ) : (
-            <div onClick={refresh}>Refresh</div>
+            <div               onClick={() =>
+              getBalance(
+                (userInfo as KadenaUserMetadata).accountName,
+                chainId
+              ).then(setBalance)
+            }>Refresh</div>
           )
         }
       />
-      <div className="code">{balance} SOL</div>
+      <div className="code">{`${balance} KDA`}</div>
     </Card>
   );
 };
