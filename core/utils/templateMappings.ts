@@ -17,9 +17,16 @@ import SolanaDedicatedScaffold, {
   flags as solanaDedicatedFlags,
 } from '../../scaffolds/nextjs-solana-dedicated-wallet/scaffold';
 import { Timer } from './timer';
+import KadenaDedicatedScaffold, {
+  flags as kadenaDedicatedFlags,
+} from '../../scaffolds/nextjs-kadena-dedicated-wallet/scaffold';
 
-export type Chain = 'evm' | 'solana' | 'flow';
-export type Template = 'nextjs-dedicated-wallet' | 'nextjs-solana-dedicated-wallet' | 'nextjs-flow-dedicated-wallet';
+export type Chain = 'evm' | 'solana' | 'flow' | 'kadena';
+export type Template =
+  | 'nextjs-dedicated-wallet'
+  | 'nextjs-solana-dedicated-wallet'
+  | 'nextjs-flow-dedicated-wallet'
+  | 'nextjs-kadena-dedicated-wallet';
 
 type ConfigType = CreateMagicAppConfig & {
   chain: Chain | undefined;
@@ -36,6 +43,8 @@ function mapTemplateToChain(template: string): Chain | undefined {
       return 'solana';
     case 'nextjs-flow-dedicated-wallet':
       return 'flow';
+    case 'nextjs-kadena-dedicated-wallet':
+      return 'kadena';
     default:
       return undefined;
   }
@@ -81,6 +90,14 @@ export async function mapTemplateToScaffold(
         data.loginMethods = await AuthTypePrompt.loginMethodsPrompt();
       }
       return new FlowDedicatedScaffold(data);
+    case 'nextjs-kadena-dedicated-wallet':
+      if (!data.network) {
+        data.network = await BlockchainNetworkPrompt.kadenaNetworkPrompt();
+      }
+      if (!data.loginMethods || data.loginMethods.length === 0) {
+        data.loginMethods = await AuthTypePrompt.loginMethodsPrompt();
+      }
+      return new KadenaDedicatedScaffold(data);
     default:
       throw new Error(`Invalid template: ${template}`);
   }
@@ -94,6 +111,8 @@ export function mapTemplateToFlags(template: string): any {
       return solanaDedicatedFlags;
     case 'nextjs-flow-dedicated-wallet':
       return flowDedicatedFlags;
+    case 'nextjs-kadena-dedicated-wallet':
+      return kadenaDedicatedFlags;
     default:
       throw new Error(`Invalid template: ${template}`);
   }
@@ -113,6 +132,15 @@ const solanaConfig = async (config: ConfigType): Promise<ConfigType> => ({
   template: 'nextjs-solana-dedicated-wallet',
   network: await BlockchainNetworkPrompt.solanaNetworkPrompt(),
   chain: 'solana',
+  isChosenTemplateValid: true,
+  isQuickstart: false,
+});
+
+const kadenaConfig = async (config: ConfigType): Promise<ConfigType> => ({
+  ...config,
+  template: 'nextjs-kadena-dedicated-wallet',
+  network: await BlockchainNetworkPrompt.kadenaNetworkPrompt(),
+  chain: 'kadena',
   isChosenTemplateValid: true,
   isQuickstart: false,
 });
@@ -146,6 +174,9 @@ export const buildTemplate = async (appConfig: ConfigType): Promise<ConfigType> 
       case 'flow':
         config.network = await BlockchainNetworkPrompt.flowNetworkPrompt();
         break;
+      case 'kadena':
+        config = await kadenaConfig(config);
+        break;
       case 'evm':
         config.network = await BlockchainNetworkPrompt.evmNetworkPrompt();
         break;
@@ -165,11 +196,14 @@ export const buildTemplate = async (appConfig: ConfigType): Promise<ConfigType> 
       'zksync-sepolia',
     ];
     const solanaNetworks = ['solana-devnet', 'solana-mainnet'];
+    const kadenaNetworks = ['kadena-testnet', 'kadena-mainnet'];
 
     if (evmNetworks.includes(config.network)) {
       config.chain = 'evm';
     } else if (solanaNetworks.includes(config.network)) {
       config.chain = 'solana';
+    } else if (kadenaNetworks.includes(config.network)) {
+      config.chain = 'kadena';
     } else {
       config.chain = 'flow';
     }

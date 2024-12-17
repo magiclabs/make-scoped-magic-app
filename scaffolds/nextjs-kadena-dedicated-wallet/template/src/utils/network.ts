@@ -1,14 +1,16 @@
+import { DEFAULT_CHAIN_ID, NETWORK_ID } from "./constants";
+
 export enum Network {
-  SOLANA_DEVNET = 'solana-devnet',
-  SOLANA_MAINNET_BETA = 'solana-mainnet',
+  KADENA_TESTNET = 'kadena-testnet',
+  KADENA_MAINNET = 'kadena-mainnet',
 }
 
-export const getNetworkUrl = () => {
+export const getNetworkUrl = (chainId: string) => {
   switch (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK) {
-    case Network.SOLANA_DEVNET:
-      return 'https://solana-devnet.g.alchemy.com/v2/NUZZICdM-417xyZwDhka3615uai5GQFr';
-    case Network.SOLANA_MAINNET_BETA:
-      return 'https://solana-mainnet.g.alchemy.com/v2/9nCoa06gjvDwYyTdV5ruBp2Qe4_wZnaO';
+    case Network.KADENA_TESTNET:
+      return `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${chainId || DEFAULT_CHAIN_ID}/pact`;;
+    case Network.KADENA_MAINNET:
+      return `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${chainId || DEFAULT_CHAIN_ID}/pact`;;
     default:
       throw new Error('Network not supported');
   }
@@ -16,18 +18,19 @@ export const getNetworkUrl = () => {
 
 export const getNetworkName = () => {
   switch (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK) {
-    case Network.SOLANA_DEVNET:
-      return 'Solana (Devnet)';
-    case Network.SOLANA_MAINNET_BETA:
-      return 'Solana (Mainnet Beta)';
+    case Network.KADENA_TESTNET:
+      return 'Kadena (Testnet)';
+    case Network.KADENA_MAINNET:
+      return 'Kadena (Mainnet)';
   }
 };
 
 export const getBlockExplorer = (address: string) => {
+  // TODO: Update block explorer URL
   switch (process.env.NEXT_PUBLIC_BLOCKCHAIN_NETWORK) {
-    case Network.SOLANA_DEVNET:
-      return `https://explorer.solana.com/address/${address}?cluster=devnet`;
-    case Network.SOLANA_MAINNET_BETA:
-      return `https://explorer.solana.com/address/${address}`;
+    case Network.KADENA_TESTNET:
+      return `https://explorer.chainweb.com/testnet/address/${address}`;
+    case Network.KADENA_MAINNET:
+      return `https://explorer.chainweb.com/address/${address}`;
   }
 };

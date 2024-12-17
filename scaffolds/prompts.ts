@@ -144,6 +144,17 @@ export namespace BlockchainNetworkPrompt {
       ],
     }).run();
 
+  export const kadenaNetworkPrompt = async () =>
+    new Select({
+      name: 'network',
+      message: 'Which network would you like to use?',
+      hint: 'We recommend starting with a test network',
+      choices: [
+        { name: 'kadena-mainnet', message: 'Mainnet' },
+        { name: 'kadena-testnet', message: 'Testnet' },
+      ],
+    }).run();
+
   export const flowNetworkPrompt = async () =>
     new Select({
       name: 'network',

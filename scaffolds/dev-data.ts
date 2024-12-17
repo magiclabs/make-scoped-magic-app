@@ -17,4 +17,10 @@ export const templateDevData = {
     loginMethods: ['EmailOTP', 'SMSOTP'],
     projectName: 'My Solana Dedicated Wallet',
   },
+  'nextjs-kadena-dedicated-wallet': {
+    network: 'kadena-testnet',
+    publishableApiKey: 'pk_live_FD2D70B32ABE11BD',
+    loginMethods: ['EmailOTP', 'SMSOTP'],
+    projectName: 'My Kadena Dedicated Wallet',
+  },
 };
