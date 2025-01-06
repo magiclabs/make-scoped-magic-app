@@ -1,7 +1,7 @@
 import { Magic } from './types';
 import { Dispatch, SetStateAction } from 'react';
 
-export type LoginMethod = 'EMAIL' | 'SMS' | 'SOCIAL' | 'FORM';
+export type LoginMethod = 'EMAIL' | 'SMS' | 'SOCIAL' | 'FORM' | 'SPIREKEY';
 
 export const logout = async (setToken: Dispatch<SetStateAction<string>>, magic: Magic | null) => {
   if (await magic?.user.isLoggedIn()) {

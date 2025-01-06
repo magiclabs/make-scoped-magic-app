@@ -5,36 +5,42 @@ import { LoginProps } from '@/utils/types';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 import { useState } from 'react';
+import { saveToken } from '@/utils/common';
 
 const SpireKey = ({ token, setToken }: LoginProps) => {
   const { magic } = useMagic();
   const [isLoginInProgress, setLoginInProgress] = useState(false);
 
   const handleLogin = async () => {
-      try {
-        setLoginInProgress(true);
-        await magic?.kadena.loginWithSpireKey();
-      } catch (e) {
-        console.log('login error: ' + JSON.stringify(e));
+    try {
+      setLoginInProgress(true);
+      const response = await magic?.kadena.loginWithSpireKey();
+      if (response) {
+        saveToken(response.accountName, setToken, 'SPIREKEY');
+      }
+    } catch (e) {
+      console.log('login error: ' + JSON.stringify(e));
+      if (e instanceof Error) {
         showToast({
-          message: 'Something went wrong. Please try again',
+          message: e.message,
           type: 'error',
         });
-      } finally {
-        setLoginInProgress(false);
+      } else {
+        showToast({
+          message: 'An unknown error occurred',
+          type: 'error',
+        });
       }
-    
+    } finally {
+      setLoginInProgress(false);
+    }
   };
 
   return (
     <Card>
       <CardHeader id="login">SpireKey Login</CardHeader>
       <div className="login-method-grid-item-container">
-        <button
-          className="login-button"
-          disabled={isLoginInProgress || token.length === 0}
-          onClick={() => handleLogin()}
-        >
+        <button className="login-button" onClick={() => handleLogin()}>
           {isLoginInProgress ? <Spinner /> : 'Log in / Sign up'}
         </button>
       </div>
