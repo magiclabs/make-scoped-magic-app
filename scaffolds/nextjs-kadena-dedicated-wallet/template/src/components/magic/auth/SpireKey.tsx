@@ -7,7 +7,7 @@ import CardHeader from '../../ui/CardHeader';
 import { useState } from 'react';
 import { saveToken } from '@/utils/common';
 
-const SpireKey = ({ token, setToken }: LoginProps) => {
+const SpireKey = ({ setToken }: LoginProps) => {
   const { magic } = useMagic();
   const [isLoginInProgress, setLoginInProgress] = useState(false);
 
@@ -39,11 +39,9 @@ const SpireKey = ({ token, setToken }: LoginProps) => {
   return (
     <Card>
       <CardHeader id="login">SpireKey Login</CardHeader>
-      <div className="login-method-grid-item-container">
-        <button className="login-button" onClick={() => handleLogin()}>
-          {isLoginInProgress ? <Spinner /> : 'Log in / Sign up'}
-        </button>
-      </div>
+      <button className="login-button" onClick={() => handleLogin()}>
+        {isLoginInProgress ? <Spinner /> : 'Log in'}
+      </button>
     </Card>
   );
 };

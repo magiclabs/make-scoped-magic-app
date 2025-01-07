@@ -9,17 +9,15 @@ import CardLabel from '@/components/ui/CardLabel';
 import Spinner from '@/components/ui/Spinner';
 import { getNetworkName } from '@/utils/network';
 import { getBalance } from '@/utils/get-balance';
-import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
 import { ChainId } from '@kadena/types';
 
 const UserInfo = ({ setToken }: LoginProps) => {
-  const { magic, chainId, setChainId } = useMagic();
+  const { magic, chainId, userInfo, setChainId, setUserInfo } = useMagic();
 
   const [balance, setBalance] = useState<String | Number>('...');
   const [copied, setCopied] = useState('Copy');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const [userInfo, setUserInfo] = useState<KadenaUserMetadata | undefined>();
   const [accountName, setAccountName] = useState('');
 
   const getUserInfo = () => {

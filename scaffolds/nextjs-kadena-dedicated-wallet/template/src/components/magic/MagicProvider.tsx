@@ -2,22 +2,27 @@ import { getNetworkUrl } from '@/utils/network';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic as MagicBase } from 'magic-sdk';
 import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { KadenaExtension } from "@magic-ext/kadena";
+import { KadenaExtension } from '@magic-ext/kadena';
 import { ChainId } from '@kadena/types';
 import { DEFAULT_CHAIN_ID, NETWORK_ID } from '@/utils/constants';
+import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
 
 export type Magic = MagicBase<OAuthExtension[] & KadenaExtension[]>;
 
 type MagicContextType = {
   magic: Magic | null;
   chainId: ChainId;
+  userInfo: KadenaUserMetadata | undefined;
   setChainId: (chainId: ChainId) => void;
+  setUserInfo: (userInfo: KadenaUserMetadata | undefined) => void;
 };
 
 const MagicContext = createContext<MagicContextType>({
   magic: null,
   chainId: DEFAULT_CHAIN_ID,
+  userInfo: undefined,
   setChainId: () => {},
+  setUserInfo: () => {},
 });
 
 export const useMagic = () => useContext(MagicContext);
@@ -25,6 +30,7 @@ export const useMagic = () => useContext(MagicContext);
 const MagicProvider = ({ children }: { children: ReactNode }) => {
   const [magic, setMagic] = useState<Magic | null>(null);
   const [chainId, setChainId] = useState<ChainId>(DEFAULT_CHAIN_ID);
+  const [userInfo, setUserInfo] = useState<KadenaUserMetadata | undefined>();
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_MAGIC_API_KEY) {
@@ -40,7 +46,6 @@ const MagicProvider = ({ children }: { children: ReactNode }) => {
         ],
       });
       setMagic(magic);
-
     }
   }, [chainId]);
 
@@ -48,9 +53,11 @@ const MagicProvider = ({ children }: { children: ReactNode }) => {
     return {
       magic,
       chainId,
-      setChainId
+      userInfo,
+      setChainId,
+      setUserInfo,
     };
-  }, [magic]);
+  }, [magic, chainId, userInfo]);
 
   return <MagicContext.Provider value={value}>{children}</MagicContext.Provider>;
 };
