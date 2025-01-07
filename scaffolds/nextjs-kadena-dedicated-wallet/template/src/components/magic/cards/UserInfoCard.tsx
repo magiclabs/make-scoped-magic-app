@@ -37,6 +37,12 @@ const UserInfo = ({ balance, setBalance, setToken }: UserInfoProps) => {
     setTimeout(() => checkLoginAndGetBalance(), 5000);
   }, []);
 
+  useEffect(() => {
+    if (userInfo) {
+      getBalance(userInfo.accountName, chainId).then(setBalance);
+    }
+  }, [chainId]);
+
   const refresh = useCallback(async () => {
     if (!userInfo) return;
     setIsRefreshing(true);
@@ -62,16 +68,11 @@ const UserInfo = ({ balance, setBalance, setToken }: UserInfoProps) => {
     }
   }, [copied, accountName]);
 
-  const handleChainIdChange = (newChainId: ChainId) => {
-    setChainId(newChainId);
-    refresh();
-  };
-
   const ChainIdSelector = () => {
     return (
       <div className="flex-row justify-between">
         <p className="card-label">Select ChainId: </p>
-        <select className="code" value={chainId} onChange={(e) => handleChainIdChange(e.target.value as ChainId)}>
+        <select className="code" value={chainId} onChange={(e) => setChainId(e.target.value as ChainId)}>
           {Array.from({ length: 20 }, (_, i) => (
             <option key={i} value={i}>
               {i}
