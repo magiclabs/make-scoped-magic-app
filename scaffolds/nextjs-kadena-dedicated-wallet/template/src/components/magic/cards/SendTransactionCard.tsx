@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import Divider from '@/components/ui/Divider';
 import { useMagic } from '../MagicProvider';
 import FormButton from '@/components/ui/FormButton';
 import FormInput from '@/components/ui/FormInput';
@@ -13,18 +12,18 @@ import TransactionHistory from '@/components/ui/TransactionHistory';
 import { ChainId, ICommand, IUnsignedCommand } from '@kadena/types';
 import { addSignatures } from '@kadena/client';
 import { checkAccountExists } from '@/utils/check-account-exists';
-import { KadenaUserMetadata, SignatureWithPublicKey } from '@magic-ext/kadena/dist/types/types';
+import { SignatureWithPublicKey } from '@magic-ext/kadena/dist/types/types';
 import { buildTransferCreateTransaction } from '@/pact/transfer-create';
 import { buildTransferTransaction } from '@/pact/transfer';
 import { PactNumber } from '@kadena/pactjs';
 import { accountToPublicKey } from '@/utils/account-to-public-key';
 import { getKadenaClient } from '@/utils/client';
 import { getBalance } from '@/utils/get-balance';
+import { SendTransactionProps } from '@/utils/types';
 
-const SendTransaction = () => {
+const SendTransaction = ({ setBalance }: SendTransactionProps) => {
   const { magic, chainId, userInfo } = useMagic();
-  const [toAddress, setToAddress] = useState('');
-  const [toAddressError, setToAddressError] = useState(false);
+  const [toAccountError, setToAccountError] = useState(false);
   const [amountError, setAmountError] = useState(false);
   const [hash, setHash] = useState('');
   const [transactionLoading, setTransactionLoadingLoading] = useState(false);
@@ -43,8 +42,8 @@ const SendTransaction = () => {
   useEffect(() => {
     setDisabled(!toAccount || !sendAmount);
     setAmountError(false);
-    setToAddressError(false);
-  }, [sendAmount, toAddress]);
+    setToAccountError(false);
+  }, [sendAmount, toAccount]);
 
   const handleBuildTransaction = async () => {
     const accountExists = await checkAccountExists(toAccount, chainId);
@@ -95,11 +94,9 @@ const SendTransaction = () => {
 
   const sendTransaction = useCallback(async () => {
     if (!userInfo?.accountName) return;
-
     setDisabled(true);
 
     try {
-      // TODO: Add chainId?
       const kadenaClient = getKadenaClient(chainId);
 
       const transaction = await handleBuildTransaction();
@@ -123,14 +120,15 @@ const SendTransaction = () => {
         console.error(response.result.error);
       } else {
         showToast({
-          message: `Transaction successful sig: ${response}`,
+          message: `Transaction successful request key: ${response.reqKey}`,
           type: 'success',
         });
+        setHash(response.reqKey);
         setTransactionLoadingLoading(false);
         setDisabled(false);
         setToAccount('');
         setSendAmount('');
-        // getBalance(userInfo.accountName, chainId).then(setBalance);
+        getBalance(userInfo.accountName, chainId).then(setBalance);
       }
     } catch (error) {
       setTransactionLoadingLoading(false);
@@ -140,7 +138,7 @@ const SendTransaction = () => {
       showToast({ message: 'Transaction failed', type: 'error' });
       console.log(error);
     }
-  }, []);
+  }, [toAccount, sendAmount, userInfo, chainId]);
 
   return (
     <Card>
@@ -150,7 +148,7 @@ const SendTransaction = () => {
         onChange={(e: any) => setToAccount(e.target.value)}
         placeholder="Receiving Account"
       />
-      {toAddressError ? <ErrorText>Invalid address</ErrorText> : null}
+      {toAccountError ? <ErrorText>Invalid account</ErrorText> : null}
       <FormInput value={sendAmount} onChange={(e: any) => setSendAmount(e.target.value)} placeholder={`Amount (KDA)`} />
       {amountError ? <ErrorText className="error">Invalid amount</ErrorText> : null}
       <FormButton onClick={sendTransaction} disabled={!toAccount || !sendAmount || disabled}>
@@ -165,7 +163,7 @@ const SendTransaction = () => {
       {hash ? (
         <>
           <Spacer size={20} />
-          <TransactionHistory />
+          <TransactionHistory reqKey={hash} />
         </>
       ) : null}
     </Card>

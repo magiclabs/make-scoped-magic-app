@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import Divider from '@/components/ui/Divider';
-import { LoginProps } from '@/utils/types';
+import { LoginProps, UserInfoProps } from '@/utils/types';
 import { logout } from '@/utils/common';
 import { useMagic } from '../MagicProvider';
 import Card from '@/components/ui/Card';
@@ -11,22 +11,15 @@ import { getNetworkName } from '@/utils/network';
 import { getBalance } from '@/utils/get-balance';
 import { ChainId } from '@kadena/types';
 
-const UserInfo = ({ setToken }: LoginProps) => {
+const UserInfo = ({ balance, setBalance, setToken }: UserInfoProps) => {
   const { magic, chainId, userInfo, setChainId, setUserInfo } = useMagic();
-
-  const [balance, setBalance] = useState<String | Number>('...');
   const [copied, setCopied] = useState('Copy');
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const [accountName, setAccountName] = useState('');
-
-  const getUserInfo = () => {
-    return magic?.kadena.getUserInfo();
-  };
 
   useEffect(() => {
     const checkLoginAndGetBalance = async () => {
-      const isLoggedIn = await getUserInfo();
+      const isLoggedIn = await magic?.user.isLoggedIn();
       if (isLoggedIn) {
         try {
           const kadenaUserInfo = await magic?.kadena.getUserInfo();
