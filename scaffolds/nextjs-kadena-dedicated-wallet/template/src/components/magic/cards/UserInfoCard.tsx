@@ -10,16 +10,17 @@ import Spinner from '@/components/ui/Spinner';
 import { getNetworkName } from '@/utils/network';
 import { getBalance } from '@/utils/get-balance';
 import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
+import { ChainId } from '@kadena/types';
 
-const UserInfo = ({ token, setToken }: LoginProps) => {
-  const { magic, chainId } = useMagic();
+const UserInfo = ({ setToken }: LoginProps) => {
+  const { magic, chainId, setChainId } = useMagic();
 
   const [balance, setBalance] = useState<String | Number>('...');
   const [copied, setCopied] = useState('Copy');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [userInfo, setUserInfo] = useState<KadenaUserMetadata | undefined>();
-  const [accountName, setAccountName] = useState(localStorage.getItem('user'));
+  const [accountName, setAccountName] = useState('');
 
   const getUserInfo = () => {
     return magic?.kadena.getUserInfo();
@@ -30,11 +31,12 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
       const isLoggedIn = await getUserInfo();
       if (isLoggedIn) {
         try {
-          const userInfo = await magic?.kadena.getUserInfo();
-          if (userInfo) {
-            localStorage.setItem('user', userInfo?.accountName);
-            setAccountName(userInfo?.accountName);
-            getBalance(userInfo.accountName, chainId).then(setBalance);
+          const kadenaUserInfo = await magic?.kadena.getUserInfo();
+          if (kadenaUserInfo) {
+            localStorage.setItem('user', kadenaUserInfo?.accountName);
+            setUserInfo(kadenaUserInfo);
+            setAccountName(kadenaUserInfo.accountName);
+            getBalance(kadenaUserInfo.accountName, chainId).then(setBalance);
           }
         } catch (e) {
           console.log('error in fetching address: ' + e);
@@ -44,23 +46,14 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
     setTimeout(() => checkLoginAndGetBalance(), 5000);
   }, []);
 
-  // const refresh = useCallback(async () => {
-  //   setIsRefreshing(true);
-  //   await getBalance();
-  //   setTimeout(() => {
-  //     setIsRefreshing(false);
-  //   }, 500);
-  // }, [getBalance]);
-
-  // useEffect(() => {
-  //   if (accountName) {
-  //     refresh();
-  //   }
-  // }, [accountName, refresh]);
-
-  // useEffect(() => {
-  //   setBalance('...');
-  // }, [magic, chainId]);
+  const refresh = useCallback(async () => {
+    if (!userInfo) return;
+    setIsRefreshing(true);
+    getBalance(userInfo.accountName, chainId).then(setBalance);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 500);
+  }, [getBalance, userInfo, chainId]);
 
   const disconnect = useCallback(async () => {
     if (magic) {
@@ -78,6 +71,26 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
     }
   }, [copied, accountName]);
 
+  const handleChainIdChange = (newChainId: ChainId) => {
+    setChainId(newChainId);
+    refresh();
+  };
+
+  const ChainIdSelector = () => {
+    return (
+      <div className="flex-row justify-between">
+        <p className="card-label">Select ChainId: </p>
+        <select className="code" value={chainId} onChange={(e) => handleChainIdChange(e.target.value as ChainId)}>
+          {Array.from({ length: 20 }, (_, i) => (
+            <option key={i} value={i}>
+              {i}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  };
+
   return (
     <Card>
       <CardHeader id="Wallet">Wallet</CardHeader>
@@ -87,8 +100,10 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
         <div className="connected">Connected to {getNetworkName()}</div>
       </div>
       <Divider />
-      <CardLabel leftHeader="Address" rightAction={!accountName ? <Spinner /> : <div onClick={copy}>{copied}</div>} />
-      <div className="code">{accountName?.length == 0 ? 'Fetching address..' : accountName}</div>
+      <CardLabel leftHeader="Account" rightAction={!accountName ? <Spinner /> : <div onClick={copy}>{copied}</div>} />
+      <div className="code">{accountName?.length == 0 ? 'Fetching account...' : accountName}</div>
+      <Divider />
+      <ChainIdSelector />
       <Divider />
       <CardLabel
         leftHeader="Balance"
@@ -98,12 +113,7 @@ const UserInfo = ({ token, setToken }: LoginProps) => {
               <Spinner />
             </div>
           ) : (
-            <div               onClick={() =>
-              getBalance(
-                (userInfo as KadenaUserMetadata).accountName,
-                chainId
-              ).then(setBalance)
-            }>Refresh</div>
+            <div onClick={refresh}>Refresh</div>
           )
         }
       />

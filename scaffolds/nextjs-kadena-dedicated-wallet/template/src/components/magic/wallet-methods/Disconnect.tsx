@@ -28,7 +28,7 @@ const Disconnect = ({ setToken }: LoginProps) => {
             <Spinner />
           </div>
         ) : (
-          'disconnect()'
+          'logout()'
         )}
       </button>
       <div className="wallet-method-desc">Disconnects user from dApp.</div>
