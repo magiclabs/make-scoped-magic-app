@@ -1,10 +1,10 @@
-import { getNetworkUrl } from '@/utils/network';
+import { getNetworkId, getNetworkUrl } from '@/utils/network';
 import { OAuthExtension } from '@magic-ext/oauth';
 import { Magic as MagicBase } from 'magic-sdk';
 import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { KadenaExtension } from '@magic-ext/kadena';
 import { ChainId } from '@kadena/types';
-import { DEFAULT_CHAIN_ID, NETWORK_ID } from '@/utils/constants';
+import { DEFAULT_CHAIN_ID } from '@/utils/constants';
 import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
 
 export type Magic = MagicBase<OAuthExtension[] & KadenaExtension[]>;
@@ -40,7 +40,7 @@ const MagicProvider = ({ children }: { children: ReactNode }) => {
           new KadenaExtension({
             rpcUrl: getNetworkUrl(chainId),
             chainId: chainId || DEFAULT_CHAIN_ID,
-            networkId: NETWORK_ID,
+            networkId: getNetworkId(),
             createAccountsOnChain: true,
           }),
         ],

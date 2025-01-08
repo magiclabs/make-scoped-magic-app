@@ -1,5 +1,5 @@
 import { ChainId, Pact } from '@kadena/client';
-import { NETWORK_ID } from '../utils/constants';
+import { getNetworkId } from '@/utils/network';
 interface KeysetRefGuardTransaction {
   chainId: ChainId;
   keysetRefGuardName: string;
@@ -8,6 +8,6 @@ export const buildKeysetRefGuardTransaction = ({ chainId, keysetRefGuardName }: 
   return Pact.builder
     .execution(`(keyset-ref-guard "${keysetRefGuardName}")`)
     .setMeta({ chainId })
-    .setNetworkId(NETWORK_ID)
+    .setNetworkId(getNetworkId())
     .createTransaction();
 };

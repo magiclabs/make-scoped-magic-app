@@ -7,9 +7,9 @@ import CardHeader from '@/components/ui/CardHeader'
 import {LoginMethod} from '@/utils/common'
 import GetIdToken from '../wallet-methods/GetIdToken'
 import GetMetadata from '../wallet-methods/GetMetadata'
-// <% if(loginMethods.map(authType => authType.replaceAll(" ", "")).includes("EmailOTP")){%>
-// <%-`import UpdateEmail from '../wallet-methods/UpdateEmail'`-%>
-// <% }%>
+<% if(loginMethods.map(authType => authType.replaceAll(" ", "")).includes("EmailOTP")){%>
+<%-`import UpdateEmail from '../wallet-methods/UpdateEmail'`-%>
+<% }%>
 
 const WalletMethods = ({token, setToken}: LoginProps) => {
 	const [loginMethod, setLoginMethod] = useState<LoginMethod | null>(
@@ -18,14 +18,14 @@ const WalletMethods = ({token, setToken}: LoginProps) => {
 	return (
 		<Card>
 			<CardHeader id='methods'>Wallet Methods</CardHeader>
-			{/* <% if(loginMethods.map(authType => authType.replaceAll(" ", "")).includes("EmailOTP")){%>
+			<% if(loginMethods.map(authType => authType.replaceAll(" ", "")).includes("EmailOTP")){%>
 				<%-`{loginMethod && loginMethod == 'EMAIL' && (
 					<>
 						<UpdateEmail />
 						<Divider />
 					</>
 				)}`-%>
-			<% }%> */}
+			<% }%>
 			<GetIdToken />
 			<Divider />
 			<GetMetadata />

@@ -1,9 +1,9 @@
 import { ChainId, Pact, ISigner } from '@kadena/client';
-import { NETWORK_ID } from '../utils/constants';
 import { IPactDecimal } from '@kadena/types';
 import { accountGuard } from '../utils/account-guard';
 import { accountProtocol } from '../utils/account-protocol';
 import { checkKeysetRefExists } from '../utils/check-keyset-ref-exists';
+import { getNetworkId } from '@/utils/network';
 
 interface TransferCrosschainTransaction {
   to: string;
@@ -40,7 +40,7 @@ export const buildTransferCrosschainTransaction = async ({
       signFor('coin.TRANSFER_XCHAIN', from, to, amount, toChainId),
     ])
     .setMeta({ chainId: fromChainId, senderAccount: from })
-    .setNetworkId(NETWORK_ID);
+    .setNetworkId(getNetworkId());
 
   if (accountProtocol(to) === 'r:') {
     const keysetRefExists = await checkKeysetRefExists(to.substring(2), toChainId);

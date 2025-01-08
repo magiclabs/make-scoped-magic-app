@@ -1,6 +1,6 @@
-import { ChainId, IPactDecimal } from "@kadena/types";
-import { ISigner, Pact } from "@kadena/client";
-import { NETWORK_ID } from "@/utils/constants";
+import { ChainId, IPactDecimal } from '@kadena/types';
+import { ISigner, Pact } from '@kadena/client';
+import { getNetworkId } from '@/utils/network';
 
 interface TransferCreateTransaction {
   to: string;
@@ -19,27 +19,26 @@ export const buildTransferTransaction = ({
   chainId,
   senderPubKey,
   receiverPubKey,
-  isSpireKeyAccount
+  isSpireKeyAccount,
 }: TransferCreateTransaction) => {
-
   const signer: ISigner = isSpireKeyAccount
     ? {
         pubKey: senderPubKey,
-        scheme: "WebAuthn",
+        scheme: 'WebAuthn',
       }
     : senderPubKey;
 
   return Pact.builder
     .execution((Pact.modules as any).coin.transfer(from, to, amount))
-    .addData("receiverKeyset", {
+    .addData('receiverKeyset', {
       keys: [receiverPubKey],
-      pred: "keys-all",
+      pred: 'keys-all',
     })
     .addSigner(signer, (withCapability: any) => [
-      withCapability("coin.GAS"),
-      withCapability("coin.TRANSFER", from, to, amount),
+      withCapability('coin.GAS'),
+      withCapability('coin.TRANSFER', from, to, amount),
     ])
     .setMeta({ chainId, senderAccount: from })
-    .setNetworkId(NETWORK_ID)
+    .setNetworkId(getNetworkId())
     .createTransaction();
 };

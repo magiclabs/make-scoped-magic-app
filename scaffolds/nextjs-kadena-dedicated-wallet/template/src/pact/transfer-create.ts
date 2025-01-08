@@ -1,6 +1,6 @@
 import { ChainId, IPactDecimal } from '@kadena/types';
 import { Pact, ISigner, literal, readKeyset } from '@kadena/client';
-import { NETWORK_ID } from '@/utils/constants';
+import { getNetworkId } from '@/utils/network';
 
 interface TransferCreateTransaction {
   to: string;
@@ -38,6 +38,6 @@ export const buildTransferCreateTransaction = ({
       withCapability('coin.TRANSFER', from, to, amount),
     ])
     .setMeta({ chainId, senderAccount: from })
-    .setNetworkId(NETWORK_ID)
+    .setNetworkId(getNetworkId())
     .createTransaction();
 };

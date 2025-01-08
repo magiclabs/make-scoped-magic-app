@@ -130,6 +130,7 @@ export namespace BlockchainNetworkPrompt {
         { name: 'evm', message: 'EVM (Ethereum, Etherlink, Polygon, etc.)' },
         { name: 'solana', message: 'Solana' },
         { name: 'flow', message: 'Flow' },
+        { name: 'kadena', message: 'Kadena' },
       ],
     }).run();
 
