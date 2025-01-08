@@ -1,3 +1,22 @@
+# v0.1.0 (Wed Jan 08 2025)
+
+#### 🚀 Enhancement
+
+- chore: update token [#15](https://github.com/magiclabs/make-scoped-magic-app/pull/15) ([@joshuascan](https://github.com/joshuascan))
+- chore: updates gh token [#14](https://github.com/magiclabs/make-scoped-magic-app/pull/14) ([@joshuascan](https://github.com/joshuascan))
+- Pdeexp 2143 add kadena to make magic cli [#13](https://github.com/magiclabs/make-scoped-magic-app/pull/13) ([@joshuascan](https://github.com/joshuascan))
+
+#### 🐛 Bug Fix
+
+- Create CODEOWNERS [#8](https://github.com/magiclabs/make-scoped-magic-app/pull/8) ([@noahyoshida](https://github.com/noahyoshida))
+
+#### Authors: 2
+
+- [@noahyoshida](https://github.com/noahyoshida)
+- Josh Scanlan ([@joshuascan](https://github.com/joshuascan))
+
+---
+
 # v0.0.4 (Tue Nov 19 2024)
 
 #### 🐛 Bug Fix
