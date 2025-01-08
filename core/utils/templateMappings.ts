@@ -95,7 +95,7 @@ export async function mapTemplateToScaffold(
         data.network = await BlockchainNetworkPrompt.kadenaNetworkPrompt();
       }
       if (!data.loginMethods || data.loginMethods.length === 0) {
-        data.loginMethods = await AuthTypePrompt.loginMethodsPrompt();
+        data.loginMethods = await AuthTypePrompt.loginMethodsPrompt('kadena');
       }
       return new KadenaDedicatedScaffold(data);
     default:

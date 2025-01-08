@@ -6,6 +6,7 @@ import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 import { useState } from 'react';
 import { saveToken } from '@/utils/common';
+import Spacer from '@/components/ui/Spacer';
 
 const SpireKey = ({ setToken }: LoginProps) => {
   const { magic } = useMagic();
@@ -39,9 +40,12 @@ const SpireKey = ({ setToken }: LoginProps) => {
   return (
     <Card>
       <CardHeader id="login">SpireKey Login</CardHeader>
-      <button className="login-button" onClick={() => handleLogin()}>
-        {isLoginInProgress ? <Spinner /> : 'Log in'}
-      </button>
+      <div className="login-method-grid-item-container">
+        <Spacer size={64} />
+        <button className="login-button" onClick={() => handleLogin()} disabled={isLoginInProgress}>
+          {isLoginInProgress ? <Spinner /> : 'Log in'}
+        </button>
+      </div>
     </Card>
   );
 };

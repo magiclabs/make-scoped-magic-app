@@ -54,6 +54,7 @@ export default class KadenaDedicatedScaffold extends BaseScaffold {
     './src/pages',
     './src/styles',
     './src/utils',
+    './src/pact',
   ];
 
   constructor(data: Data) {

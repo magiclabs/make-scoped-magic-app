@@ -1,6 +1,5 @@
 import { LoginProps } from '@/utils/types'
 import Header from './Header'
-import SpireKey from './auth/SpireKey'
 <% loginMethods.forEach(authType => { %>
 <%-`import ${authType.replaceAll(' ', '')} from './auth/${authType.replaceAll(' ', '')}';`-%>
 <% }) %>
@@ -15,7 +14,6 @@ const Login = ({ token, setToken }: LoginProps) => {
         <%-`<${authType.replaceAll(' ', '')} token={token} setToken={setToken} />`-%>
       <% } %>
   		<% }) %>
-      <SpireKey token={token} setToken={setToken} />
       </div>
     </div>
   )
