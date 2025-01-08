@@ -127,11 +127,29 @@ const quickstartConfig = (config: ConfigType): ConfigType => ({
   isQuickstart: true,
 });
 
+const evmConfig = async (config: ConfigType): Promise<ConfigType> => ({
+  ...config,
+  template: 'nextjs-dedicated-wallet',
+  network: await BlockchainNetworkPrompt.evmNetworkPrompt(),
+  chain: 'evm',
+  isChosenTemplateValid: true,
+  isQuickstart: false,
+});
+
 const solanaConfig = async (config: ConfigType): Promise<ConfigType> => ({
   ...config,
   template: 'nextjs-solana-dedicated-wallet',
   network: await BlockchainNetworkPrompt.solanaNetworkPrompt(),
   chain: 'solana',
+  isChosenTemplateValid: true,
+  isQuickstart: false,
+});
+
+const flowConfig = async (config: ConfigType): Promise<ConfigType> => ({
+  ...config,
+  template: 'nextjs-flow-dedicated-wallet',
+  network: await BlockchainNetworkPrompt.flowNetworkPrompt(),
+  chain: 'flow',
   isChosenTemplateValid: true,
   isQuickstart: false,
 });
@@ -172,16 +190,16 @@ export const buildTemplate = async (appConfig: ConfigType): Promise<ConfigType> 
         config = await solanaConfig(config);
         break;
       case 'flow':
-        config.network = await BlockchainNetworkPrompt.flowNetworkPrompt();
+        config = await flowConfig(config);
         break;
       case 'kadena':
         config = await kadenaConfig(config);
         break;
       case 'evm':
-        config.network = await BlockchainNetworkPrompt.evmNetworkPrompt();
+        config = await evmConfig(config);
         break;
       default:
-        config.network = await BlockchainNetworkPrompt.evmNetworkPrompt();
+        config = await evmConfig(config);
         break;
     }
   } else {
@@ -209,7 +227,6 @@ export const buildTemplate = async (appConfig: ConfigType): Promise<ConfigType> 
     }
   }
 
-  config.template = config.chain === 'flow' ? 'nextjs-flow-dedicated-wallet' : 'nextjs-dedicated-wallet';
   config.isChosenTemplateValid = true;
 
   return config;
