@@ -130,6 +130,7 @@ export namespace BlockchainNetworkPrompt {
         { name: 'evm', message: 'EVM (Ethereum, Etherlink, Polygon, etc.)' },
         { name: 'solana', message: 'Solana' },
         { name: 'flow', message: 'Flow' },
+        { name: 'kadena', message: 'Kadena' },
       ],
     }).run();
 
@@ -141,6 +142,17 @@ export namespace BlockchainNetworkPrompt {
       choices: [
         { name: 'solana-mainnet', message: 'Mainnet' },
         { name: 'solana-devnet', message: 'Devnet' },
+      ],
+    }).run();
+
+  export const kadenaNetworkPrompt = async () =>
+    new Select({
+      name: 'network',
+      message: 'Which network would you like to use?',
+      hint: 'We recommend starting with a test network',
+      choices: [
+        { name: 'kadena-mainnet', message: 'Mainnet' },
+        { name: 'kadena-testnet', message: 'Testnet' },
       ],
     }).run();
 
@@ -182,7 +194,7 @@ export namespace BlockchainNetworkPrompt {
 }
 
 export namespace AuthTypePrompt {
-  const authMethods = [
+  const baseAuthMethods = [
     { name: 'Email OTP' },
     { name: 'SMS OTP', hint: '(Must toggle on at https://dashboard.magic.link)' },
     {
@@ -196,12 +208,29 @@ export namespace AuthTypePrompt {
     loginMethods: string[];
   };
 
-  export const loginMethodsPrompt = async () =>
+  const getAuthMethods = (blockchain?: string) => {
+    const methods = [...baseAuthMethods];
+    if (blockchain === 'kadena') {
+      const smsIndex = methods.findIndex((method) => method.name === 'SMS OTP');
+      if (smsIndex !== -1) {
+        methods.splice(smsIndex + 1, 0, {
+          name: 'SpireKey',
+        });
+      } else {
+        methods.push({
+          name: 'SpireKey',
+        });
+      }
+    }
+    return methods;
+  };
+
+  export const loginMethodsPrompt = async (blockchain?: string) =>
     new MultiSelect({
       message:
         'How do you want your users to log in to their wallet? See Magic docs for help (https://magic.link/docs/auth/overview)',
       hint: '(<space> to select, <return> to submit)',
-      choices: authMethods,
+      choices: getAuthMethods(blockchain),
       validate: (value: string | any[]) => {
         if (!value.length) {
           return `Please use spacebar to select at least one login option.`;
@@ -217,8 +246,10 @@ export namespace AuthTypePrompt {
   export const flags: Flags<Partial<Data>> = {
     loginMethods: {
       type: [String],
-      description: `The auth method(s) of your choice. You can provide this flag multiple times to select multiple methods. (one of: ${authMethods
-        .map((method) => (method.choices ? method.choices.map((choice) => choice).join(', ') : method.name))
+      description: `The auth method(s) of your choice. You can provide this flag multiple times to select multiple methods. (one of: ${baseAuthMethods
+        .map((method: { name: string; hint?: string; choices?: string[] }) =>
+          method.choices ? method.choices.map((choice) => choice).join(', ') : method.name,
+        )
         .join(', ')})`,
       validate: () => {
         const invalid: string[] = [];
@@ -257,6 +288,10 @@ export namespace AuthTypePrompt {
 
     if (input.replaceAll(' ', '').toLocaleLowerCase().includes('twitch')) {
       return 'Twitch';
+    }
+
+    if (input.replaceAll(' ', '').toLocaleLowerCase().includes('spirekey')) {
+      return 'SpireKey';
     }
 
     return input;
