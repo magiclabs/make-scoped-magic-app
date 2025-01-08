@@ -8,22 +8,22 @@ import showToast from '@/utils/showToast';
 import Spinner from '@/components/ui/Spinner';
 import Spacer from '@/components/ui/Spacer';
 import TransactionHistory from '@/components/ui/TransactionHistory';
-import { ICommand, IUnsignedCommand } from '@kadena/types';
-import { checkAccountExists } from '@/utils/check-account-exists';
-import { buildTransferCreateTransaction } from '@/pact/transfer-create';
-import { buildTransferTransaction } from '@/pact/transfer';
+import { ChainId, ICommand, IUnsignedCommand } from '@kadena/types';
+import { addSignatures, ITransactionDescriptor } from '@kadena/client';
 import { PactNumber } from '@kadena/pactjs';
 import { accountToPublicKey } from '@/utils/account-to-public-key';
 import { getKadenaClient } from '@/utils/client';
 import { getBalance } from '@/utils/get-balance';
 import { SendTransactionProps } from '@/utils/types';
-import { addSignatures } from '@kadena/client';
+import { buildTransferContinuationTransaction } from '@/pact/transfer-continuation';
+import { buildTransferCrosschainTransaction } from '@/pact/transfer-crosschain';
 import { SignatureWithPublicKey } from '@magic-ext/kadena/dist/types/types';
 
-const SendTransaction = ({ setBalance }: SendTransactionProps) => {
+const SendCrosschainTransaction = ({ setBalance }: SendTransactionProps) => {
   const { magic, chainId, userInfo } = useMagic();
   const [toAccount, setToAccount] = useState('');
   const [sendAmount, setSendAmount] = useState('');
+  const [destinationChainId, setDestinationChainId] = useState<ChainId | string>('');
   const [disabled, setDisabled] = useState(false);
   const [transactionLoading, setTransactionLoading] = useState(false);
   const [hash, setHash] = useState('');
@@ -43,40 +43,29 @@ const SendTransaction = ({ setBalance }: SendTransactionProps) => {
   };
 
   const handleBuildTransaction = async () => {
-    const accountExists = await checkAccountExists(toAccount, chainId);
-
     const to = toAccount;
     const from = userInfo?.accountName as string;
     const amount = new PactNumber(sendAmount).toPactDecimal();
+    const toChainId = destinationChainId as ChainId;
+    const fromChainId = chainId;
     const senderPubKey = userInfo?.publicKey as string;
     const receiverPubKey = accountToPublicKey(to);
     const isSpireKeyAccount = Boolean(userInfo?.loginType === 'spirekey');
 
-    if (accountExists) {
-      return buildTransferTransaction({
-        to,
-        from,
-        amount,
-        chainId,
-        senderPubKey,
-        receiverPubKey,
-        isSpireKeyAccount,
-      });
-    }
-
-    return buildTransferCreateTransaction({
+    return buildTransferCrosschainTransaction({
       to,
       from,
       amount,
-      chainId,
+      toChainId,
+      fromChainId,
       senderPubKey,
       receiverPubKey,
       isSpireKeyAccount,
     });
   };
 
-  // Same Chain Transaction
-  const handleSendTransaction = useCallback(async () => {
+  // Cross Chain Transaction
+  const handleSendTransactionStart = useCallback(async () => {
     if (!userInfo?.accountName) return;
     setTransactionLoading(true);
     setDisabled(true);
@@ -99,47 +88,97 @@ const SendTransaction = ({ setBalance }: SendTransactionProps) => {
       console.log('broadcasting transaction...', transactionDescriptor);
 
       const response = await kadenaClient.listen(transactionDescriptor);
-      setDisabled(false);
 
       if (response.result.status === 'failure') {
         console.error(response.result.error);
       } else {
-        console.log('transaction success! response:', response);
-        showToast({
-          message: `Transaction successful request key: ${response.reqKey}`,
-          type: 'success',
-        });
-        setHash(response.reqKey);
-        setTransactionLoading(false);
-        setDisabled(false);
-        setToAccount('');
-        setSendAmount('');
+        console.log('transaction start success! response:', response);
         getBalance(userInfo.accountName, chainId).then(setBalance);
+        await handleSendTransactionFinish(transactionDescriptor);
       }
     } catch (error) {
+      console.error('Failed to send transaction', error);
       setTransactionLoading(false);
       setDisabled(false);
       showToast({ message: 'Transaction failed', type: 'error' });
-      console.log(error);
     }
-  }, [toAccount, sendAmount, userInfo, chainId]);
+  }, [toAccount, sendAmount, destinationChainId, userInfo, chainId]);
+
+  const handleSendTransactionFinish = useCallback(
+    async (transactionDescriptor: ITransactionDescriptor) => {
+      if (!userInfo?.accountName) return;
+
+      try {
+        const kadenaClientOriginChain = getKadenaClient(chainId);
+        const kadenaClientTargetChain = getKadenaClient(destinationChainId as ChainId);
+
+        console.log('fetching proof for cross-chain transaction...');
+        const proof = await kadenaClientOriginChain.pollCreateSpv(transactionDescriptor, destinationChainId as ChainId);
+
+        const status = await kadenaClientOriginChain.listen(transactionDescriptor);
+        console.log('status', status);
+
+        const continuationTransaction = buildTransferContinuationTransaction({
+          proof,
+          pactId: status.continuation?.pactId ?? '',
+          toChainId: destinationChainId as ChainId,
+        });
+
+        const continuationTxDescriptor = await kadenaClientTargetChain.submit(continuationTransaction as ICommand);
+        console.log('broadcasting continuation transaction...', continuationTxDescriptor);
+
+        const response = await kadenaClientTargetChain.listen(continuationTxDescriptor);
+        setDisabled(false);
+
+        if (response.result.status === 'failure') {
+          console.error(response.result.error);
+        } else {
+          console.log('transaction continuation success! response:', response);
+          showToast({
+            message: `Transaction successful request key: ${response.reqKey}`,
+            type: 'success',
+          });
+          setHash(response.reqKey);
+          setTransactionLoading(false);
+          setDisabled(false);
+          setToAccount('');
+          setSendAmount('');
+          setDestinationChainId('');
+        }
+      } catch (error) {
+        console.error('Failed to complete cross-chain transaction', error);
+        setTransactionLoading(false);
+        setDisabled(false);
+        showToast({ message: 'Transaction failed', type: 'error' });
+      }
+    },
+    [userInfo, chainId, destinationChainId],
+  );
 
   return (
     <Card>
-      <CardHeader id="send-transaction">Send Transaction (same chain)</CardHeader>
+      <CardHeader id="send-transaction">Send Transaction (cross chain)</CardHeader>
       <FormInput
         value={toAccount}
         onChange={(e: any) => setToAccount(e.target.value)}
         placeholder="Receiving Account"
       />
-      <FormInput value={sendAmount} onChange={(e: any) => setSendAmount(e.target.value)} placeholder={`Amount (KDA)`} />
-      <FormButton onClick={handleSendTransaction} disabled={!toAccount || !sendAmount || disabled}>
+      <FormInput value={sendAmount} onChange={(e: any) => setSendAmount(e.target.value)} placeholder="Amount (KDA)" />
+      <FormInput
+        value={destinationChainId}
+        onChange={(e: any) => setDestinationChainId(e.target.value)}
+        placeholder="Destination Chain"
+      />
+      <FormButton
+        onClick={handleSendTransactionStart}
+        disabled={!toAccount || !sendAmount || !destinationChainId || disabled}
+      >
         {transactionLoading ? (
           <div className="w-full loading-container">
             <Spinner />
           </div>
         ) : (
-          'Send Transaction'
+          'Send Cross Chain Transaction'
         )}
       </FormButton>
       {hash ? (
@@ -152,4 +191,4 @@ const SendTransaction = ({ setBalance }: SendTransactionProps) => {
   );
 };
 
-export default SendTransaction;
+export default SendCrosschainTransaction;
