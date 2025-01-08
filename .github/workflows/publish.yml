@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SVC_GIT_FG_TOKEN }}
 
       - name: Prepare repository
         run: git fetch --unshallow --tags
