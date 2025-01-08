@@ -7,7 +7,7 @@ import { ChainId } from '@kadena/types';
 import { DEFAULT_CHAIN_ID } from '@/utils/constants';
 import { KadenaUserMetadata } from '@magic-ext/kadena/dist/types/types';
 
-export type Magic = MagicBase<OAuthExtension[] & KadenaExtension[]>;
+export type Magic = MagicBase<{ oauth: OAuthExtension; kadena: KadenaExtension }>;
 
 type MagicContextType = {
   magic: Magic | null;
