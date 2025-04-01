@@ -10,7 +10,6 @@ import showToast from '@/utils/showToast';
 import Spinner from '@/components/ui/Spinner';
 import { getFaucetUrl, getNetwork } from '@/utils/network';
 import Image from 'next/image';
-import Link from 'public/link.svg';
 import * as fcl from '@onflow/fcl';
 import Spacer from '@/components/ui/Spacer';
 import TransactionHistory from '@/components/ui/TransactionHistory';
@@ -78,8 +77,8 @@ const SendTransaction = () => {
         <div>
           <a href={getFaucetUrl()} target="_blank" rel="noreferrer">
             <FormButton onClick={() => null} disabled={false}>
-              Get Test FLOW
-              <Image src={Link} alt="link-icon" className="ml-[3px]" />
+              {/* Get Test {getNetworkToken()} getNetworkToken() is not defined */}
+              <Image src="/link.svg" alt="link-icon" width={24} height={24} className="ml-[3px]" />
             </FormButton>
           </a>
           <Divider />

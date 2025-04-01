@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import Link from 'public/link.svg';
 import { getBlockExplorer } from '@/utils/network';
 
 const TransactionHistory = () => {
@@ -9,7 +8,7 @@ const TransactionHistory = () => {
   return (
     <a className="action-button" href={getBlockExplorer(publicAddress as string)} target="_blank" rel="noreferrer">
       <div className="flex items-center justify-center">
-        Transaction History <Image src={Link} alt="link-icon" className="ml-[3px]" />
+        Transaction History <Image src="/link.svg" alt="link-icon" width={24} height={24} className="ml-[3px]" />
       </div>
     </a>
   );

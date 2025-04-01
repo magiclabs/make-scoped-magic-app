@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { saveToken } from '@/utils/common';
 import Spinner from '../../ui/Spinner';
 import Image from 'next/image';
-import twitch from 'public/social/Twitch.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 
@@ -61,7 +60,7 @@ const Twitch = ({ token, setToken }: LoginProps) => {
             }}
             disabled={false}
           >
-            <Image src={twitch} alt="Twitch" height={24} width={24} className="mr-6" />
+            <Image src="/social/Twitch.svg" alt="Twitch" height={24} width={24} className="mr-6" />
             <div className="text-xs font-semibold text-center w-full">Continue with Twitch</div>
           </button>
         </div>
