@@ -36,5 +36,3 @@ const MagicDashboardRedirect = () => {
     </div>
   );
 };
-
-export default MagicDashboardRedirect;

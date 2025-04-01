@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { saveUserInfo } from '@/utils/common';
 import Spinner from '../../ui/Spinner';
 import Image from 'next/image';
-import twitter from 'public/social/Twitter.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 
@@ -64,7 +63,7 @@ const Twitter = ({ token, setToken }: LoginProps) => {
             }}
             disabled={false}
           >
-            <Image src={twitter} alt="Twitter" height={24} width={24} className="mr-6" />
+            <Image src="/social/Twitter.svg" alt="Twitter" height={24} width={24} className="mr-6" />
             <div className="w-full text-xs font-semibold text-center">Continue with Twitter</div>
           </button>
         </div>

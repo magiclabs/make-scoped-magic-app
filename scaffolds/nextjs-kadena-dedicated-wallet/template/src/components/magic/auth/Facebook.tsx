@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { saveToken } from '@/utils/common';
 import Spinner from '../../ui/Spinner';
 import Image from 'next/image';
-import facebook from 'public/social/Facebook.svg';
 import Card from '../../ui/Card';
 import CardHeader from '../../ui/CardHeader';
 
@@ -61,7 +60,7 @@ const Facebook = ({ token, setToken }: LoginProps) => {
             }}
             disabled={false}
           >
-            <Image src={facebook} alt="Facebook" height={24} width={24} className="mr-6" />
+            <Image src="/social/Facebook.svg" alt="Facebook" height={24} width={24} className="mr-6" />
             <div className="text-xs font-semibold text-center w-full">Continue with Facebook</div>
           </button>
         </div>
