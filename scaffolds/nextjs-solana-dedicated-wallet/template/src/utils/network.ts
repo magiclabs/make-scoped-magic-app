@@ -1,5 +1,5 @@
 export enum Network {
-  SOLANA_DEVNET = 'solana-devnet',
+  SOLANA_DEVNET = 'solana-testnet',
   SOLANA_MAINNET_BETA = 'solana-mainnet',
 }
 
